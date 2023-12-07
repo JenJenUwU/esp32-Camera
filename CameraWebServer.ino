@@ -60,19 +60,32 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
   </head>
   <body>
     <h1>ESP32-CAM Terminal</h1>
-    <img src="" id="photo" >
-    <table>
-      
-      <tr><td colspan="3" align="center"><button class="button" onmousedown="toggleCheckbox('forward');" ontouchstart="toggleCheckbox('forward');" onmouseup="toggleCheckbox('stop');" ontouchend="toggleCheckbox('stop');">Forward</button></td></tr>
-      <tr><td align="center"><button class="button" onmousedown="toggleCheckbox('left');" ontouchstart="toggleCheckbox('left');" onmouseup="toggleCheckbox('stop');" ontouchend="toggleCheckbox('stop');">Left</button></td><td align="center"><button class="button" onmousedown="toggleCheckbox('stop');" ontouchstart="toggleCheckbox('stop');">Stop</button></td><td align="center"><button class="button" onmousedown="toggleCheckbox('right');" ontouchstart="toggleCheckbox('right');" onmouseup="toggleCheckbox('stop');" ontouchend="toggleCheckbox('stop');">Right</button></td></tr>
-      <tr><td colspan="3" align="center"><button class="button" onmousedown="toggleCheckbox('backward');" ontouchstart="toggleCheckbox('backward');" onmouseup="toggleCheckbox('stop');" ontouchend="toggleCheckbox('stop');">Backward</button></td></tr>                   
-    </table>
+    <img src="" id="photo" ><br/>
+    <label for="input1">Input 1 : </label>
+    <input type="text" id="input1" value="">
+    <button id="btn1">Submit</button><br/>
+    <label for="input2">Input 2: </label>
+    <input type="text" id="input2" value="">
+    <button id="btn2">Submit</button>
    <script>
-   function toggleCheckbox(x) {
-     var xhr = new XMLHttpRequest();
-     xhr.open("GET", "/action?go=" + x, true);
-     xhr.send();
-   }
+    function updateValue(inputId) {
+    var inputElement = document.getElementById(inputId);
+    var inputValue = inputElement.value;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/action?go=" + inputElement.id + inputValue, true);
+    xhr.send();
+
+    // Clear the input box
+    inputElement.value = "";
+  }
+
+  document.getElementById("btn1").addEventListener("click", function() {
+    updateValue("input1");
+  });
+
+  document.getElementById("btn2").addEventListener("click", function() {
+    updateValue("input2");
+  });
    window.onload = document.getElementById("photo").src = window.location.href.slice(0, -1) + ":81/stream";
   </script>
   </body>
@@ -175,7 +188,7 @@ static esp_err_t cmd_handler(httpd_req_t *req){
 
   sensor_t * s = esp_camera_sensor_get();
   int res = 0;
-  
+  /*
   if(!strcmp(variable, "forward")) {
     Serial.println("Forward");
   }
@@ -193,8 +206,14 @@ static esp_err_t cmd_handler(httpd_req_t *req){
   }
   else {
     res = -1;
-  }
+  }*/
 
+  Serial.print("Command: ");
+  Serial.println(variable);
+
+  if (strlen(variable) == 0) {
+    res = -1;
+  } 
   if(res){
     return httpd_resp_send_500(req);
   }
