@@ -61,7 +61,7 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
   <body>
     <h1>ESP32-CAM Terminal</h1>
     <img src="" id="photo" ><br/>
-    <label for="input1">Input 1 : </label>
+    <label for="input1">Input 1: </label>
     <input type="text" id="input1" value="">
     <button id="btn1">Submit</button><br/>
     <label for="input2">Input 2: </label>
@@ -188,28 +188,18 @@ static esp_err_t cmd_handler(httpd_req_t *req){
 
   sensor_t * s = esp_camera_sensor_get();
   int res = 0;
-  /*
-  if(!strcmp(variable, "forward")) {
-    Serial.println("Forward");
-  }
-  else if(!strcmp(variable, "left")) {
-    Serial.println("Left");
-  }
-  else if(!strcmp(variable, "right")) {
-    Serial.println("Right");
-  }
-  else if(!strcmp(variable, "backward")) {
-    Serial.println("Backward");
-  }
-  else if(!strcmp(variable, "stop")) {
-    Serial.println("Stop");
-  }
-  else {
-    res = -1;
-  }*/
 
-  Serial.print("Command: ");
-  Serial.println(variable);
+  if (strncmp(variable, "input1", 6) == 0) {
+    Serial.println("Command for input1");
+  }
+
+  // Check if variable starts with "input2"
+  else if (strncmp(variable, "input2", 6) == 0) {
+    Serial.println("Command for input2");
+  }
+  char restOfString[32];
+  strcpy(restOfString, variable + 6); 
+  Serial.println(restOfString);
 
   if (strlen(variable) == 0) {
     res = -1;
