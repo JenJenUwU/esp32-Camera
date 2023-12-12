@@ -7,6 +7,7 @@
 #include "soc/soc.h" //disable brownout problems
 #include "soc/rtc_cntl_reg.h"  //disable brownout problems
 #include "esp_http_server.h"
+#include <LiquidCrystal_I2C.h>
 
 #define PART_BOUNDARY "123456789000000000000987654321"
 #define CAMERA_MODEL_AI_THINKER
@@ -15,6 +16,9 @@
 const char ssid[] = SECRET_SSID;
 const char password[] = SECRET_PASS;
 
+int lcdColumns = 16;
+int lcdRows = 2;
+LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows); 
 
 
 static const char* _STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" PART_BOUNDARY;
@@ -190,16 +194,20 @@ static esp_err_t cmd_handler(httpd_req_t *req){
   int res = 0;
 
   if (strncmp(variable, "input1", 6) == 0) {
-    Serial.println("Command for input1");
+    lcd.setCursor(0, 0);
+    lcd.print("                ");
+    lcd.setCursor(0, 0);
   }
 
   // Check if variable starts with "input2"
   else if (strncmp(variable, "input2", 6) == 0) {
-    Serial.println("Command for input2");
+    lcd.setCursor(0, 1);
+    lcd.print("                ");
+    lcd.setCursor(0, 1);
   }
   char restOfString[32];
   strcpy(restOfString, variable + 6); 
-  Serial.println(restOfString);
+  lcd.print(restOfString);
 
   if (strlen(variable) == 0) {
     res = -1;
@@ -246,6 +254,10 @@ void startCameraServer(){
 }
 
 void setup() {
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print("Starting");
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); //disable brownout detector
 
   
@@ -301,6 +313,11 @@ void setup() {
   
   Serial.print("Camera Stream Ready! Go to: http://");
   Serial.println(WiFi.localIP());
+  lcd.setCursor(0,0);
+  lcd.print("Ready! Go to");
+  lcd.setCursor(0,1);
+  lcd.print(WiFi.localIP());
+  lcd.setCursor(0,0);
   
   // Start streaming web server
   startCameraServer();
